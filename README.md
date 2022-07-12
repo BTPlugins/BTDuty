@@ -1,5 +1,3 @@
-BTDuty
-
 # BTDuty
 Your normal Duty Plugin with more Features!
 <br/>
