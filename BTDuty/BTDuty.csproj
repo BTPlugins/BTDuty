@@ -76,6 +76,7 @@
     <Compile Include="Commands\DutyCommand.cs" />
     <Compile Include="Commands\ListTagsCommand.cs" />
     <Compile Include="Commands\TimeClockCommand.cs" />
+    <Compile Include="Helpers\DebugManager.cs" />
     <Compile Include="Helpers\PlayerHelper.cs" />
     <Compile Include="Helpers\ThreadHelper.cs" />
     <Compile Include="Helpers\TimeConverterManager.cs" />

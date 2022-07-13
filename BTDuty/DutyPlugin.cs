@@ -33,14 +33,6 @@ namespace BTDuty
             Logger.Log("###     https://discord.gg/YsaXwBSTSm     ###", ConsoleColor.Yellow);
             Logger.Log("#############################################", ConsoleColor.Yellow);
             //
-            Logger.Log("|--------------------------------------------|");
-            Logger.Log("|   Name:   |   Group ID:   |   Permission   |");
-            Logger.Log("|-----------|---------------|----------------|");
-            foreach (var group in DutyPlugin.Instance.Configuration.Instance.DutyGroups)
-            {
-                Logger.Log("|   " + group.DutyName + "   |   " + group.GroupID + "   |   " + group.Permission + "   |");
-            }
-            Logger.Log("|-----------|---------------|----------------|");
             StartCoroutine(ActiveDutySender(DutyPlugin.Instance.Configuration.Instance.ActiveDutyList.Timer));
             //
             U.Events.OnPlayerConnected += OnPlayerConnected;
@@ -49,13 +41,16 @@ namespace BTDuty
 
         private void OnPlayerConnected(UnturnedPlayer player)
         {
+            DebugManager.SendDebugMessage(player.CharacterName + " has joined the Server. Checking for Duty Permissions");
             // Check if they are found in the Group. If so, Annouce that you have logged in and on duty
             if (onDuty.ContainsKey(player.CSteamID))
             {
+                DebugManager.SendDebugMessage("onDuty Conmtains " + player.CharacterName + "CSteamID");
                 var onDuty = DutyPlugin.Instance.onDuty[player.CSteamID];
                 var dutyGroup = R.Permissions.GetGroup(onDuty.GroupID);
                 if (dutyGroup == null)
                 {
+                    DebugManager.SendDebugMessage("Invalid Group");
                     Logger.LogWarning("----------------------------------------");
                     Logger.LogWarning("ERROR: Invalid Group: " + onDuty.GroupID);
                     Logger.LogWarning("ERROR: Invalid Group: " + onDuty.GroupID);
@@ -63,18 +58,9 @@ namespace BTDuty
                     Logger.LogWarning("----------------------------------------");
                     return;
                 }
-                if (dutyGroup.Members.Contains(player.CSteamID.m_SteamID.ToString()))
+                if (!dutyGroup.Members.Contains(player.CSteamID.m_SteamID.ToString()))
                 {
-                    // Just send Message
-                    if (DutyPlugin.Instance.Configuration.Instance.ServerAnnouncer.Enabled && !player.HasPermission(DutyPlugin.Instance.Configuration.Instance.ServerAnnouncer.BypassPermission))
-                    {
-                        foreach (SteamPlayer steamPlayer in Provider.clients)
-                        {
-                            UnturnedPlayer user = UnturnedPlayer.FromSteamPlayer(steamPlayer);
-                            TranslationHelper.SendMessageTranslation(user.CSteamID, "Broadcast_OffDuty", player.CharacterName, onDuty.DutyName);
-                        }
-                        return;
-                    }
+                    DebugManager.SendDebugMessage("Added " + player.CharacterName + " to " + onDuty.GroupID + " Group");
                     // Add them to Group, and Broadcast
                     R.Permissions.AddPlayerToGroup(onDuty.GroupID, player);
                     TranslationHelper.SendMessageTranslation(player.CSteamID, "Duty_OnDuty", onDuty.DutyName);
@@ -83,7 +69,20 @@ namespace BTDuty
                         foreach (SteamPlayer steamPlayer in Provider.clients)
                         {
                             UnturnedPlayer user = UnturnedPlayer.FromSteamPlayer(steamPlayer);
-                            TranslationHelper.SendMessageTranslation(user.CSteamID, "Broadcast_OffDuty", player.CharacterName, onDuty.DutyName);
+                            TranslationHelper.SendMessageTranslation(user.CSteamID, "Broadcast_OnDuty", player.CharacterName, onDuty.DutyName);
+                        }
+                    }
+                }
+                else
+                {
+                    DebugManager.SendDebugMessage(player.CharacterName + " already in " + onDuty.GroupID + ". Just broadcasting Message");
+                    // Already In group, So just boradcast
+                    if (DutyPlugin.Instance.Configuration.Instance.ServerAnnouncer.Enabled && !player.HasPermission(DutyPlugin.Instance.Configuration.Instance.ServerAnnouncer.BypassPermission))
+                    {
+                        foreach (SteamPlayer steamPlayer in Provider.clients)
+                        {
+                            UnturnedPlayer user = UnturnedPlayer.FromSteamPlayer(steamPlayer);
+                            TranslationHelper.SendMessageTranslation(user.CSteamID, "Broadcast_OnDuty", player.CharacterName, onDuty.DutyName);
                         }
                     }
                 }
@@ -92,13 +91,16 @@ namespace BTDuty
 
         private void OnPlayerDisconnected(UnturnedPlayer player)
         {
+            DebugManager.SendDebugMessage(player.CharacterName + " has left the server. Checking Duty");
             if (DutyPlugin.Instance.Configuration.Instance.RemoveDutyOnLogout)
             {
+                DebugManager.SendDebugMessage("Remove On Duty Logout set to TRUE");
                 if (onDuty.ContainsKey(player.CSteamID))
                 {
                     var offDuty = DutyPlugin.Instance.onDuty[player.CSteamID];
                     if (R.Permissions.GetGroup(offDuty.GroupID) == null)
                     {
+                        DebugManager.SendDebugMessage("Invalid Group");
                         Logger.LogWarning("----------------------------------------");
                         Logger.LogWarning("ERROR: Invalid Group: " + offDuty.GroupID);
                         Logger.LogWarning("ERROR: Invalid Group: " + offDuty.GroupID);
@@ -116,6 +118,7 @@ namespace BTDuty
                             TranslationHelper.SendMessageTranslation(user.CSteamID, "Broadcast_OffDuty", player.CharacterName, offDuty.DutyName);
                         }
                     }
+                    DebugManager.SendDebugMessage("Player Logout - Sending Webhook");
                     ThreadHelper.RunAsynchronously(() =>
                     {
                         WebhookMessage Embed = new WebhookMessage()
@@ -164,6 +167,7 @@ namespace BTDuty
             }
             R.Permissions.RemovePlayerFromGroup(offDuty.GroupID, player);
             if (!DutyPlugin.Instance.onDuty.TryGetValue(player.CSteamID, out DutyPlugin.OnDutyHolder value)) return;
+            onDuty.Remove(player.CSteamID);
             TranslationHelper.SendMessageTranslation(player.CSteamID, "Duty_OffDuty", value.DutyName, TimeConverterManager.Format(TimeConverterManager.getTimeSpan(value.StartDate, DateTime.Now), 2));
             if (DutyPlugin.Instance.Configuration.Instance.ServerAnnouncer.Enabled && !player.HasPermission(DutyPlugin.Instance.Configuration.Instance.ServerAnnouncer.BypassPermission))
             {

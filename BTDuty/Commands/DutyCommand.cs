@@ -29,6 +29,7 @@ namespace BTDuty.Commands
             UnturnedPlayer player = (UnturnedPlayer)caller;
             if (DutyPlugin.Instance.onDuty.ContainsKey(player.CSteamID))
             {
+                DebugManager.SendDebugMessage(player.CharacterName + " has gone off Duty");
                 DutyPlugin.Instance.OffDutyOnline(player);
                 return;
             }
@@ -38,8 +39,15 @@ namespace BTDuty.Commands
                 return;
             }
             var duty = DutyPlugin.Instance.Configuration.Instance.DutyGroups.FirstOrDefault(k => k.DutyName.Equals(command[0], StringComparison.OrdinalIgnoreCase));
+            if(duty == null)
+            {
+                TranslationHelper.SendMessageTranslation(player.CSteamID, "DutyGroup_NotFound", command[0]);
+                DebugManager.SendDebugMessage("Duty - Invlaid Duty Group Selected");
+                return;
+            }
             if (R.Permissions.GetGroup(duty.GroupID) == null)
             {
+                DebugManager.SendDebugMessage("Invalid Group");
                 Logger.LogWarning("----------------------------------------");
                 Logger.LogWarning("ERROR: Invalid Group: " + duty.GroupID);
                 Logger.LogWarning("ERROR: Invalid Group: " + duty.GroupID);
@@ -51,12 +59,14 @@ namespace BTDuty.Commands
             if (!player.HasPermission(duty.Permission))
             {
                 // Missing Perms to go further.
+                DebugManager.SendDebugMessage(player.CharacterName + " Missing Permission: " + duty.Permission + " for " + duty.DutyName);
                 TranslationHelper.SendMessageTranslation(player.CSteamID, "Duty_MissingPerm", duty.Permission, duty.DutyName);
                 return;
             }
             if (DutyPlugin.Instance.onDuty.ContainsKey(player.CSteamID))
             {
                 // Going off Duty
+                DebugManager.SendDebugMessage(player.CharacterName + " has gone off Duty");
                 R.Permissions.RemovePlayerFromGroup(duty.GroupID, player);
                 if (!DutyPlugin.Instance.onDuty.TryGetValue(player.CSteamID, out DutyPlugin.OnDutyHolder value)) return;
                 TranslationHelper.SendMessageTranslation(player.CSteamID, "Duty_OffDuty", value.DutyName, TimeConverterManager.Format(TimeConverterManager.getTimeSpan(value.StartDate, DateTime.Now), 2));
@@ -68,6 +78,7 @@ namespace BTDuty.Commands
                         TranslationHelper.SendMessageTranslation(user.CSteamID, "Broadcast_OffDuty", player.CharacterName, duty.DutyName);
                     }
                 }
+                DebugManager.SendDebugMessage("Duty - Sending Webhook");
                 ThreadHelper.RunAsynchronously(() =>
                 {
                     WebhookMessage Embed = new WebhookMessage()
@@ -87,6 +98,7 @@ namespace BTDuty.Commands
                 return;
             }
             // Going on Duty
+            DebugManager.SendDebugMessage(player.CharacterName + " is now going on Duty for: " + duty.DutyName);
             R.Permissions.AddPlayerToGroup(duty.GroupID, player);
             DutyPlugin.Instance.onDuty.Add(player.CSteamID, new DutyPlugin.OnDutyHolder { DutyName = duty.DutyName, GroupID = duty.GroupID, Permission = duty.Permission, StartDate = DateTime.Now });
             TranslationHelper.SendMessageTranslation(player.CSteamID, "Duty_OnDuty", duty.DutyName);

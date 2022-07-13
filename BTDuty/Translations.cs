@@ -42,7 +42,10 @@ namespace BTDuty
                 "TimeClock_NotOnDuty", "[color=#FF0000]{{BTDuty}} [/color][color=#3E65FF]{0}[color=#F3F3F3] is currently not on Duty![/color]"
             },
             {
-                "TimeClock_OnDuty", "[color=#3E65FF]{0}[/color][color=#F3F3F3] TimeClock | Duty Name:[/color] [color=#3E65FF]{1}[/color] [color=#F3F3F3]| TimeClock:[/color][color=#3E65FF] {2}[/color]"
+                "TimeClock_OnDuty", "[color=#FF0000]{{BTDuty}} [/color][color=#3E65FF]{0}[/color][color=#F3F3F3] TimeClock | Duty Name:[/color] [color=#3E65FF]{1}[/color] [color=#F3F3F3]| TimeClock:[/color][color=#3E65FF] {2}[/color]"
+            },
+            {
+                "DutyGroup_NotFound", "[color=#FF0000]{{BTDuty}} [/color][color=#3E65FF]{0}[/color][color=#F3F3F3] Duty Group not found![/color]"
             }
         };
     }

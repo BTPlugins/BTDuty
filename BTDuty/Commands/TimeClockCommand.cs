@@ -43,6 +43,7 @@ namespace BTDuty.Commands
                 return;
             }
             TranslationHelper.SendMessageTranslation(player.CSteamID, "TimeClock_OnDuty", target.CharacterName, duty.DutyName, TimeConverterManager.Format(TimeConverterManager.getTimeSpan(duty.StartDate, DateTime.Now), 2));
+            DebugManager.SendDebugMessage(player.CharacterName + " has checked " + player.CharacterName + " TimeClock: " + TimeConverterManager.Format(TimeConverterManager.getTimeSpan(duty.StartDate, DateTime.Now), 2));
         }
     }
 }
