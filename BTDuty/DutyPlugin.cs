@@ -92,6 +92,11 @@ namespace BTDuty
         private void OnPlayerDisconnected(UnturnedPlayer player)
         {
             DebugManager.SendDebugMessage(player.CharacterName + " has left the server. Checking Duty");
+            if(DutyPlugin.Instance.Configuration.Instance.RemoveBlueHammerOnLogout && player.IsAdmin)
+            {
+                player.Admin(false);
+                DebugManager.SendDebugMessage("Removing Admin from " + player.CharacterName + " on Logout");
+            }
             if (DutyPlugin.Instance.Configuration.Instance.RemoveDutyOnLogout)
             {
                 DebugManager.SendDebugMessage("Remove On Duty Logout set to TRUE");
@@ -169,6 +174,11 @@ namespace BTDuty
             if (!DutyPlugin.Instance.onDuty.TryGetValue(player.CSteamID, out DutyPlugin.OnDutyHolder value)) return;
             onDuty.Remove(player.CSteamID);
             TranslationHelper.SendMessageTranslation(player.CSteamID, "Duty_OffDuty", value.DutyName, TimeConverterManager.Format(TimeConverterManager.getTimeSpan(value.StartDate, DateTime.Now), 2));
+            if (player.IsAdmin)
+            {
+                player.Admin(false);
+                DebugManager.SendDebugMessage("Removing BlueHammer for " + player.CharacterName);
+            }
             if (DutyPlugin.Instance.Configuration.Instance.ServerAnnouncer.Enabled && !player.HasPermission(DutyPlugin.Instance.Configuration.Instance.ServerAnnouncer.BypassPermission))
             {
                 foreach (SteamPlayer steamPlayer in Provider.clients)

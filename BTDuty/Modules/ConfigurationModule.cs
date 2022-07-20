@@ -12,5 +12,6 @@ namespace BTDuty.Modules
         public string DutyName { get; set; }
         public string GroupID { get; set; }
         public string Permission { get; set; }
+        public bool BlueHammer { get; set; }
     }
 }

@@ -66,6 +66,11 @@ namespace BTDuty.Commands
             if (DutyPlugin.Instance.onDuty.ContainsKey(player.CSteamID))
             {
                 // Going off Duty
+                if(player.IsAdmin)
+                {
+                    player.Admin(false);
+                    DebugManager.SendDebugMessage("Removing BlueHammer for " + player.CharacterName);
+                }
                 DebugManager.SendDebugMessage(player.CharacterName + " has gone off Duty");
                 R.Permissions.RemovePlayerFromGroup(duty.GroupID, player);
                 if (!DutyPlugin.Instance.onDuty.TryGetValue(player.CSteamID, out DutyPlugin.OnDutyHolder value)) return;
@@ -102,6 +107,10 @@ namespace BTDuty.Commands
             R.Permissions.AddPlayerToGroup(duty.GroupID, player);
             DutyPlugin.Instance.onDuty.Add(player.CSteamID, new DutyPlugin.OnDutyHolder { DutyName = duty.DutyName, GroupID = duty.GroupID, Permission = duty.Permission, StartDate = DateTime.Now });
             TranslationHelper.SendMessageTranslation(player.CSteamID, "Duty_OnDuty", duty.DutyName);
+            if (duty.BlueHammer)
+            {
+                player.Admin(true);
+            }
             if (DutyPlugin.Instance.Configuration.Instance.ServerAnnouncer.Enabled && !player.HasPermission(DutyPlugin.Instance.Configuration.Instance.ServerAnnouncer.BypassPermission))
             {
                 foreach (SteamPlayer steamPlayer in Provider.clients)

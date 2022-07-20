@@ -13,6 +13,7 @@ namespace BTDuty
     {
         public ServerAnnouncer ServerAnnouncer { get; set; }
         public bool RemoveDutyOnLogout { get; set; }
+        public bool RemoveBlueHammerOnLogout { get; set; }
         public string DutyLogWebhook { get; set; }
 
         [XmlArrayItem("Group")]
@@ -27,6 +28,7 @@ namespace BTDuty
                 BypassPermission = "NoSendMessage.IfHaveThisPerm",
             };
             RemoveDutyOnLogout = false;
+            RemoveBlueHammerOnLogout = true;
             DutyLogWebhook = "https://discordapp.com/api/webhooks/{webhook.id}/{webhook.api}";
             DutyGroups = new List<DutyGroups>()
             {
@@ -35,18 +37,21 @@ namespace BTDuty
                     DutyName = "Helper",
                     GroupID = "Helper",
                     Permission = "BTDuty.Helper",
+                    BlueHammer = false,
                 },
                 new DutyGroups()
                 {
                     DutyName = "Mod",
                     GroupID = "Moderator",
                     Permission = "BTDuty.Moderator",
+                    BlueHammer = false,
                 },
                 new DutyGroups()
                 {
                     DutyName = "Admin",
                     GroupID = "Administrator",
                     Permission = "BTDuty.Administrator",
+                    BlueHammer = true,
                 },
             };
             ActiveDutyList = new ActiveDutyList()
