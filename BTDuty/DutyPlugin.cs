@@ -37,6 +37,21 @@ namespace BTDuty
             //
             U.Events.OnPlayerConnected += OnPlayerConnected;
             U.Events.OnPlayerDisconnected += OnPlayerDisconnected;
+            DamageTool.damagePlayerRequested += DamageTool_damagePlayerRequested;
+
+        }
+
+        private void DamageTool_damagePlayerRequested(ref DamagePlayerParameters parameters, ref bool shouldAllow)
+        {
+            var killer = UnturnedPlayer.FromCSteamID(parameters.killer);
+            var victim = UnturnedPlayer.FromPlayer(parameters.player);
+            if (killer == null || victim == null) return;
+            if (onDuty.ContainsKey(killer.CSteamID) && DutyPlugin.Instance.Configuration.Instance.CancelDamageOnDuty)
+            {
+                DebugManager.SendDebugMessage("Canceling Damage from " + killer.CharacterName);
+                TranslationHelper.SendMessageTranslation(killer.CSteamID, "DamageCanceled", victim.CharacterName);
+                shouldAllow = false;
+            }
         }
 
         private void OnPlayerConnected(UnturnedPlayer player)
@@ -147,6 +162,9 @@ namespace BTDuty
 
         protected override void Unload()
         {
+            U.Events.OnPlayerConnected -= OnPlayerConnected;
+            U.Events.OnPlayerDisconnected -= OnPlayerDisconnected;
+            DamageTool.damagePlayerRequested -= DamageTool_damagePlayerRequested;
             Logger.Log("BTDuty Unloaded");
         }
         public class OnDutyHolder
@@ -179,6 +197,10 @@ namespace BTDuty
                 player.Admin(false);
                 DebugManager.SendDebugMessage("Removing BlueHammer for " + player.CharacterName);
             }
+            //
+            player.Features.GodMode = false;
+            player.Features.VanishMode = false;
+            //
             if (DutyPlugin.Instance.Configuration.Instance.ServerAnnouncer.Enabled && !player.HasPermission(DutyPlugin.Instance.Configuration.Instance.ServerAnnouncer.BypassPermission))
             {
                 foreach (SteamPlayer steamPlayer in Provider.clients)

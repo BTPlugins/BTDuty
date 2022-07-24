@@ -14,6 +14,9 @@ namespace BTDuty
         public ServerAnnouncer ServerAnnouncer { get; set; }
         public bool RemoveDutyOnLogout { get; set; }
         public bool RemoveBlueHammerOnLogout { get; set; }
+        public bool CancelDamageOnDuty { get; set; }
+        public bool VanishOnDuty { get; set; }
+        public bool GodmodeOnDuty { get; set; }
         public string DutyLogWebhook { get; set; }
 
         [XmlArrayItem("Group")]
@@ -29,6 +32,9 @@ namespace BTDuty
             };
             RemoveDutyOnLogout = false;
             RemoveBlueHammerOnLogout = true;
+            CancelDamageOnDuty = true;
+            GodmodeOnDuty = true;
+            VanishOnDuty = true;
             DutyLogWebhook = "https://discordapp.com/api/webhooks/{webhook.id}/{webhook.api}";
             DutyGroups = new List<DutyGroups>()
             {

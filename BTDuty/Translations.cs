@@ -46,6 +46,9 @@ namespace BTDuty
             },
             {
                 "DutyGroup_NotFound", "[color=#FF0000]{{BTDuty}} [/color][color=#3E65FF]{0}[/color][color=#F3F3F3] Duty Group not found![/color]"
+            },
+            {
+                "DamageCanceled", "[color=#FF0000]{{BTDuty}} [/color][color=#F3F3F3]Unable to Damage [/color][color=#3E65FF]{0} [/color][color=#F3F3F3]while being on Duty![/color]"
             }
         };
     }

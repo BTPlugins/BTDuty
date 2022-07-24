@@ -71,6 +71,10 @@ namespace BTDuty.Commands
                     player.Admin(false);
                     DebugManager.SendDebugMessage("Removing BlueHammer for " + player.CharacterName);
                 }
+                //
+                player.Features.GodMode = false;
+                player.Features.VanishMode = false;
+                //
                 DebugManager.SendDebugMessage(player.CharacterName + " has gone off Duty");
                 R.Permissions.RemovePlayerFromGroup(duty.GroupID, player);
                 if (!DutyPlugin.Instance.onDuty.TryGetValue(player.CSteamID, out DutyPlugin.OnDutyHolder value)) return;
@@ -111,6 +115,16 @@ namespace BTDuty.Commands
             {
                 player.Admin(true);
             }
+            //
+            if (DutyPlugin.Instance.Configuration.Instance.VanishOnDuty)
+            {
+                player.Features.VanishMode = true;
+            }
+            if (DutyPlugin.Instance.Configuration.Instance.GodmodeOnDuty)
+            {
+                player.Features.GodMode = true;
+            }
+            //
             if (DutyPlugin.Instance.Configuration.Instance.ServerAnnouncer.Enabled && !player.HasPermission(DutyPlugin.Instance.Configuration.Instance.ServerAnnouncer.BypassPermission))
             {
                 foreach (SteamPlayer steamPlayer in Provider.clients)
