@@ -49,19 +49,19 @@ namespace BTDuty
             if (user is UnturnedPlayer player)
             {
                 Logger.Log("1");
-                if (onDuty.ContainsKey(player.CSteamID) && !player.HasPermission(DutyPlugin.Instance.Configuration.Instance.RestrictionsHolder.BypassPermission))
+                if (onDuty.ContainsKey(player.CSteamID) && !(R.Permissions.GetPermissions(player, DutyPlugin.Instance.Configuration.Instance.RestrictionsHolder.BypassPermission).Count != 0))
                 {
                     Logger.Log("2");
                     var IsCanceld = false;
                     foreach (var comm in DutyPlugin.Instance.Configuration.Instance.RestrictionsHolder.RestrictedCommand)
                     {
                         Logger.Log("3");
-                        Logger.Log(command.Name);
-                        Logger.Log(comm);
-                        Logger.Log("----------------------------------------------------");
+                        DebugManager.SendDebugMessage("Real Command: " + command.Name);
+                        DebugManager.SendDebugMessage("Configuration Command: " + comm);
+                        DebugManager.SendDebugMessage("----------------------------------------------------");
                         if (command.Name.Equals(comm, StringComparison.OrdinalIgnoreCase))
                         {
-                            Logger.Log("4");
+                            DebugManager.SendDebugMessage("Restricted Command: " + player.CharacterName + " tried using " + command.Name + " while on Duty!");
                             TranslationHelper.SendMessageTranslation(player.CSteamID, "RestrictedCommand", command.Name);
                             IsCanceld = true;
                             cancel = true;
