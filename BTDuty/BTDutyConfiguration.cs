@@ -14,14 +14,15 @@ namespace BTDuty
         public ServerAnnouncer ServerAnnouncer { get; set; }
         public bool RemoveDutyOnLogout { get; set; }
         public bool RemoveBlueHammerOnLogout { get; set; }
-        public bool CancelDamageOnDuty { get; set; }
+        public bool AllowDamageToPlayers { get; set; }
         public bool VanishOnDuty { get; set; }
         public bool GodmodeOnDuty { get; set; }
-        public string DutyLogWebhook { get; set; }
-
+        public WebhookContainer WebhookContainer { get; set; }
         [XmlArrayItem("Group")]
         public List<DutyGroups> DutyGroups { get; set; }
         public ActiveDutyList ActiveDutyList { get; set; }
+        //
+        public Restrictions RestrictionsHolder { get; set; }
         public bool DebugMode { get; set; }
         public void LoadDefaults()
         {
@@ -32,10 +33,16 @@ namespace BTDuty
             };
             RemoveDutyOnLogout = false;
             RemoveBlueHammerOnLogout = true;
-            CancelDamageOnDuty = true;
+            AllowDamageToPlayers = true;
             GodmodeOnDuty = true;
             VanishOnDuty = true;
-            DutyLogWebhook = "https://discordapp.com/api/webhooks/{webhook.id}/{webhook.api}";
+            WebhookContainer = new WebhookContainer()
+            {
+                DutyLogWebhook = "https://discordapp.com/api/webhooks/{webhook.id}/{webhook.api}",
+                ActiveDutyWebhook = "https://discordapp.com/api/webhooks/{webhook.id}/{webhook.api}",
+                CommandWebhook = "https://discordapp.com/api/webhooks/{webhook.id}/{webhook.api}",
+                ItemAddedWebhook = "https://discordapp.com/api/webhooks/{webhook.id}/{webhook.api}",
+            };
             DutyGroups = new List<DutyGroups>()
             {
                 new DutyGroups()
@@ -64,20 +71,19 @@ namespace BTDuty
             {
                 Enabled = true,
                 Timer = 300f,
-                WebhookURL = "https://discordapp.com/api/webhooks/{webhook.id}/{webhook.api}",
+            };
+            RestrictionsHolder = new Restrictions()
+            {
+                BypassPermission = "Ignore.CommandRestrictions",
+                RestrictedCommand = new List<string>()
+                {
+                    "Admin",
+                    "Slay",
+                    "frisk",
+                },
             };
             DebugMode = false;
         }
     }
-    public class ServerAnnouncer
-    {
-        public bool Enabled { get; set; }
-        public string BypassPermission { get; set; }
-    }
-    public class ActiveDutyList
-    {
-        public bool Enabled { get; set; }
-        public float Timer { get; set; }
-        public string WebhookURL { get; set; }
-    }
+
 }

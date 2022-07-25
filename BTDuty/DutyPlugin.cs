@@ -38,7 +38,53 @@ namespace BTDuty
             U.Events.OnPlayerConnected += OnPlayerConnected;
             U.Events.OnPlayerDisconnected += OnPlayerDisconnected;
             DamageTool.damagePlayerRequested += DamageTool_damagePlayerRequested;
+            R.Commands.OnExecuteCommand += OnCommandExecuted;
 
+        }
+
+        private void OnCommandExecuted(IRocketPlayer user, IRocketCommand command, ref bool cancel)
+        {
+            Logger.Log("Command Ran");
+            Logger.Log(command.Name);
+            if (user is UnturnedPlayer player)
+            {
+                Logger.Log("1");
+                if (onDuty.ContainsKey(player.CSteamID) && !player.HasPermission(DutyPlugin.Instance.Configuration.Instance.RestrictionsHolder.BypassPermission))
+                {
+                    Logger.Log("2");
+                    var IsCanceld = false;
+                    foreach (var comm in DutyPlugin.Instance.Configuration.Instance.RestrictionsHolder.RestrictedCommand)
+                    {
+                        Logger.Log("3");
+                        Logger.Log(command.Name);
+                        Logger.Log(comm);
+                        Logger.Log("----------------------------------------------------");
+                        if (command.Name.Equals(comm, StringComparison.OrdinalIgnoreCase))
+                        {
+                            Logger.Log("4");
+                            TranslationHelper.SendMessageTranslation(player.CSteamID, "RestrictedCommand", command.Name);
+                            IsCanceld = true;
+                            cancel = true;
+                            break;
+                        }
+                    }
+                    ThreadHelper.RunAsynchronously(() =>
+                    {
+                        WebhookMessage Embed = new WebhookMessage()
+                        .PassEmbed()
+                        .WithTitle(player.CharacterName + "**(" + player.CSteamID + ")**")
+                        .WithColor(EmbedColor.Orange)
+                        .WithURL("https://steamcommunity.com/profiles/" + player.CSteamID)
+                        .WithTimestamp(DateTime.Now)
+                        .WithDescription("**Command Executed**")
+                        .WithField("**Command:**", command.Name)
+                        .WithField("Cancled: ", IsCanceld.ToString())
+
+                        .Finalize();
+                        DiscordWebhookService.PostMessageAsync(DutyPlugin.Instance.Configuration.Instance.WebhookContainer.CommandWebhook, Embed);
+                    });
+                }
+            }
         }
 
         private void DamageTool_damagePlayerRequested(ref DamagePlayerParameters parameters, ref bool shouldAllow)
@@ -46,7 +92,7 @@ namespace BTDuty
             var killer = UnturnedPlayer.FromCSteamID(parameters.killer);
             var victim = UnturnedPlayer.FromPlayer(parameters.player);
             if (killer == null || victim == null) return;
-            if (onDuty.ContainsKey(killer.CSteamID) && DutyPlugin.Instance.Configuration.Instance.CancelDamageOnDuty)
+            if (onDuty.ContainsKey(killer.CSteamID) && DutyPlugin.Instance.Configuration.Instance.AllowDamageToPlayers)
             {
                 DebugManager.SendDebugMessage("Canceling Damage from " + killer.CharacterName);
                 TranslationHelper.SendMessageTranslation(killer.CSteamID, "DamageCanceled", victim.CharacterName);
@@ -152,7 +198,7 @@ namespace BTDuty
                         .WithField("**Total Time** ", "``" + TimeConverterManager.Format(TimeConverterManager.getTimeSpan(value.StartDate, DateTime.Now), 2) + "``")
                         .WithField("**Duty Information**", "Duty Name: ``" + offDuty.DutyName + "``\nPermission: ``" + offDuty.Permission + "``")
                         .Finalize();
-                        DiscordWebhookService.PostMessageAsync(DutyPlugin.Instance.Configuration.Instance.DutyLogWebhook, Embed);
+                        DiscordWebhookService.PostMessageAsync(DutyPlugin.Instance.Configuration.Instance.WebhookContainer.DutyLogWebhook, Embed);
                     });
                     DutyPlugin.Instance.onDuty.Remove(player.CSteamID);
                     return;
@@ -165,6 +211,7 @@ namespace BTDuty
             U.Events.OnPlayerConnected -= OnPlayerConnected;
             U.Events.OnPlayerDisconnected -= OnPlayerDisconnected;
             DamageTool.damagePlayerRequested -= DamageTool_damagePlayerRequested;
+            R.Commands.OnExecuteCommand -= OnCommandExecuted;
             Logger.Log("BTDuty Unloaded");
         }
         public class OnDutyHolder
@@ -222,7 +269,7 @@ namespace BTDuty
                 .WithField("**Total Time** ", "``" + TimeConverterManager.Format(TimeConverterManager.getTimeSpan(value.StartDate, DateTime.Now), 2) + "``")
                 .WithField("**Duty Information**", "Duty Name: ``" + offDuty.DutyName + "``\nPermission: ``" + offDuty.Permission + "``")
                 .Finalize();
-                DiscordWebhookService.PostMessageAsync(DutyPlugin.Instance.Configuration.Instance.DutyLogWebhook, Embed);
+                DiscordWebhookService.PostMessageAsync(DutyPlugin.Instance.Configuration.Instance.WebhookContainer.DutyLogWebhook, Embed);
             });
             DutyPlugin.Instance.onDuty.Remove(player.CSteamID);
             return;
@@ -265,7 +312,7 @@ namespace BTDuty
                     .WithDescription("**Server IP:** " + serverIP + "\n **Server Port:** " + Provider.port + "\n\n**[ Duty List ]**\n\n" + sb.ToString());
                     embed.footer = new WebhookFooter() { text = "BTDuty - " + DateTime.Now.ToString("dddd, dd MMMM yyyy") + "" };
                     var send = embed.Finalize();
-                    DiscordWebhookService.PostMessageAsync(DutyPlugin.Instance.Configuration.Instance.ActiveDutyList.WebhookURL, send);
+                    DiscordWebhookService.PostMessageAsync(DutyPlugin.Instance.Configuration.Instance.WebhookContainer.ActiveDutyWebhook, send);
                 });
                 yield return new WaitForSeconds(time);
             }

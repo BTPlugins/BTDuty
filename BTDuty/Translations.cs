@@ -49,6 +49,9 @@ namespace BTDuty
             },
             {
                 "DamageCanceled", "[color=#FF0000]{{BTDuty}} [/color][color=#F3F3F3]Unable to Damage [/color][color=#3E65FF]{0} [/color][color=#F3F3F3]while being on Duty![/color]"
+            },
+            {
+                "RestrictedCommand", "[color=#FF0000]{{BTDuty}} [/color][color=#F3F3F3]Restricted Command! Command:[/color] [color=#3E65FF]{0}[/color]"
             }
         };
     }
