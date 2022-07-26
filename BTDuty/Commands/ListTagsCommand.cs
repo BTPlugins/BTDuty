@@ -18,7 +18,7 @@ namespace BTDuty.Commands
 
         public string Syntax => "ListTags";
 
-        public List<string> Aliases => new List<string>();
+        public List<string> Aliases => new List<string>() { "DutyTags"};
 
         public List<string> Permissions => new List<string>() { "BTDuty.ListTags" };
 

@@ -15,8 +15,6 @@ namespace BTDuty
         public bool RemoveDutyOnLogout { get; set; }
         public bool RemoveBlueHammerOnLogout { get; set; }
         public bool AllowDamageToPlayers { get; set; }
-        public bool VanishOnDuty { get; set; }
-        public bool GodmodeOnDuty { get; set; }
         public WebhookContainer WebhookContainer { get; set; }
         [XmlArrayItem("Group")]
         public List<DutyGroups> DutyGroups { get; set; }
@@ -32,10 +30,8 @@ namespace BTDuty
                 BypassPermission = "NoSendMessage.IfHaveThisPerm",
             };
             RemoveDutyOnLogout = false;
-            RemoveBlueHammerOnLogout = true;
+            RemoveBlueHammerOnLogout = false;
             AllowDamageToPlayers = true;
-            GodmodeOnDuty = true;
-            VanishOnDuty = true;
             WebhookContainer = new WebhookContainer()
             {
                 DutyLogWebhook = "https://discordapp.com/api/webhooks/{webhook.id}/{webhook.api}",
@@ -51,6 +47,8 @@ namespace BTDuty
                     GroupID = "Helper",
                     Permission = "BTDuty.Helper",
                     BlueHammer = false,
+                    Vanish = true,
+                    Godmode = true,
                 },
                 new DutyGroups()
                 {
@@ -58,6 +56,8 @@ namespace BTDuty
                     GroupID = "Moderator",
                     Permission = "BTDuty.Moderator",
                     BlueHammer = false,
+                    Vanish = true,
+                    Godmode = true,
                 },
                 new DutyGroups()
                 {
@@ -65,6 +65,8 @@ namespace BTDuty
                     GroupID = "Administrator",
                     Permission = "BTDuty.Administrator",
                     BlueHammer = true,
+                    Vanish = false,
+                    Godmode = false,
                 },
             };
             ActiveDutyList = new ActiveDutyList()

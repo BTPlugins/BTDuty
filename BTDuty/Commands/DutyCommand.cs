@@ -66,7 +66,7 @@ namespace BTDuty.Commands
             if (DutyPlugin.Instance.onDuty.ContainsKey(player.CSteamID))
             {
                 // Going off Duty
-                if(player.IsAdmin)
+                if(player.IsAdmin && DutyPlugin.Instance.onDuty[player.CSteamID].BlueHammer)
                 {
                     player.Admin(false);
                     DebugManager.SendDebugMessage("Removing BlueHammer for " + player.CharacterName);
@@ -109,18 +109,18 @@ namespace BTDuty.Commands
             // Going on Duty
             DebugManager.SendDebugMessage(player.CharacterName + " is now going on Duty for: " + duty.DutyName);
             R.Permissions.AddPlayerToGroup(duty.GroupID, player);
-            DutyPlugin.Instance.onDuty.Add(player.CSteamID, new DutyPlugin.OnDutyHolder { DutyName = duty.DutyName, GroupID = duty.GroupID, Permission = duty.Permission, StartDate = DateTime.Now });
+            DutyPlugin.Instance.onDuty.Add(player.CSteamID, new DutyPlugin.OnDutyHolder { DutyName = duty.DutyName, GroupID = duty.GroupID, BlueHammer = duty.BlueHammer, GodMode = duty.Godmode, Vanish = duty.Vanish, Permission = duty.Permission, StartDate = DateTime.Now });
             TranslationHelper.SendMessageTranslation(player.CSteamID, "Duty_OnDuty", duty.DutyName);
             if (duty.BlueHammer)
             {
                 player.Admin(true);
             }
             //
-            if (DutyPlugin.Instance.Configuration.Instance.VanishOnDuty)
+            if (DutyPlugin.Instance.onDuty[player.CSteamID].Vanish)
             {
                 player.Features.VanishMode = true;
             }
-            if (DutyPlugin.Instance.Configuration.Instance.GodmodeOnDuty)
+            if (DutyPlugin.Instance.onDuty[player.CSteamID].GodMode)
             {
                 player.Features.GodMode = true;
             }

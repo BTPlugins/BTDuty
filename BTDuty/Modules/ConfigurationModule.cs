@@ -13,6 +13,8 @@ namespace BTDuty.Modules
         public string GroupID { get; set; }
         public string Permission { get; set; }
         public bool BlueHammer { get; set; }
+        public bool Godmode { get; set; }
+        public bool Vanish { get; set; }
     }
 
     public class WebhookContainer

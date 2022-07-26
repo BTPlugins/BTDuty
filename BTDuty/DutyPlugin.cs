@@ -16,6 +16,7 @@ using UnityEngine;
 using BTDuty.Helpers;
 using ShimmyMySherbet.DiscordWebhooks.Embeded;
 using Rocket.Core;
+using Rocket.Unturned.Enumerations;
 
 namespace BTDuty
 {
@@ -39,23 +40,54 @@ namespace BTDuty
             U.Events.OnPlayerDisconnected += OnPlayerDisconnected;
             DamageTool.damagePlayerRequested += DamageTool_damagePlayerRequested;
             R.Commands.OnExecuteCommand += OnCommandExecuted;
+            UnturnedPlayerEvents.OnPlayerInventoryAdded += OnPlayerInventoryAdded;
 
+        }
+
+        protected override void Unload()
+        {
+            U.Events.OnPlayerConnected -= OnPlayerConnected;
+            U.Events.OnPlayerDisconnected -= OnPlayerDisconnected;
+            DamageTool.damagePlayerRequested -= DamageTool_damagePlayerRequested;
+            R.Commands.OnExecuteCommand -= OnCommandExecuted;
+            UnturnedPlayerEvents.OnPlayerInventoryAdded -= OnPlayerInventoryAdded;
+            Logger.Log("BTDuty Unloaded");
+        }
+
+        private void OnPlayerInventoryAdded(UnturnedPlayer player, InventoryGroup inventoryGroup, byte inventoryIndex, ItemJar P)
+        {
+            DebugManager.SendDebugMessage("Item Added to Inventory");
+            if (onDuty.ContainsKey(player.CSteamID))
+            {
+                DebugManager.SendDebugMessage("Sending Webhook");
+                ThreadHelper.RunAsynchronously(() =>
+                {
+                    WebhookMessage Embed = new WebhookMessage()
+                    .PassEmbed()
+                    .WithTitle(player.CharacterName + " **(" + player.CSteamID + ")**")
+                    .WithColor(EmbedColor.GreenYellow)
+                    .WithThumbnail(player.SteamProfile.AvatarFull.AbsoluteUri)
+                    .WithURL("https://steamcommunity.com/profiles/" + player.CSteamID)
+                    .WithTimestamp(DateTime.Now)
+                    .WithDescription("**Item Added**")
+                    .WithField("**Item Name**", Assets.find(EAssetType.ITEM, P.item.id)?.FriendlyName)
+                    .WithField("**Item ID**", P.item.id.ToString())
+                    .Finalize();
+                    DiscordWebhookService.PostMessageAsync(DutyPlugin.Instance.Configuration.Instance.WebhookContainer.ItemAddedWebhook, Embed);
+                });
+            }
         }
 
         private void OnCommandExecuted(IRocketPlayer user, IRocketCommand command, ref bool cancel)
         {
-            Logger.Log("Command Ran");
-            Logger.Log(command.Name);
+            DebugManager.SendDebugMessage("Command Executed");
             if (user is UnturnedPlayer player)
             {
-                Logger.Log("1");
                 if (onDuty.ContainsKey(player.CSteamID) && !(R.Permissions.GetPermissions(player, DutyPlugin.Instance.Configuration.Instance.RestrictionsHolder.BypassPermission).Count != 0))
                 {
-                    Logger.Log("2");
                     var IsCanceld = false;
                     foreach (var comm in DutyPlugin.Instance.Configuration.Instance.RestrictionsHolder.RestrictedCommand)
                     {
-                        Logger.Log("3");
                         DebugManager.SendDebugMessage("Real Command: " + command.Name);
                         DebugManager.SendDebugMessage("Configuration Command: " + comm);
                         DebugManager.SendDebugMessage("----------------------------------------------------");
@@ -72,14 +104,14 @@ namespace BTDuty
                     {
                         WebhookMessage Embed = new WebhookMessage()
                         .PassEmbed()
-                        .WithTitle(player.CharacterName + "**(" + player.CSteamID + ")**")
+                        .WithTitle(player.CharacterName + " **(" + player.CSteamID + ")**")
                         .WithColor(EmbedColor.Orange)
+                        .WithThumbnail(player.SteamProfile.AvatarFull.AbsoluteUri)
                         .WithURL("https://steamcommunity.com/profiles/" + player.CSteamID)
                         .WithTimestamp(DateTime.Now)
                         .WithDescription("**Command Executed**")
                         .WithField("**Command:**", command.Name)
                         .WithField("Cancled: ", IsCanceld.ToString())
-
                         .Finalize();
                         DiscordWebhookService.PostMessageAsync(DutyPlugin.Instance.Configuration.Instance.WebhookContainer.CommandWebhook, Embed);
                     });
@@ -206,22 +238,6 @@ namespace BTDuty
             }
         }
 
-        protected override void Unload()
-        {
-            U.Events.OnPlayerConnected -= OnPlayerConnected;
-            U.Events.OnPlayerDisconnected -= OnPlayerDisconnected;
-            DamageTool.damagePlayerRequested -= DamageTool_damagePlayerRequested;
-            R.Commands.OnExecuteCommand -= OnCommandExecuted;
-            Logger.Log("BTDuty Unloaded");
-        }
-        public class OnDutyHolder
-        { 
-            public string DutyName { get; set; }
-            public string GroupID { get; set; }
-            public string Permission { get; set; }
-            public DateTime StartDate { get; set; }
-        }
-
         public void OffDutyOnline(UnturnedPlayer player)
         {
             var offDuty = DutyPlugin.Instance.onDuty[player.CSteamID];
@@ -239,7 +255,7 @@ namespace BTDuty
             if (!DutyPlugin.Instance.onDuty.TryGetValue(player.CSteamID, out DutyPlugin.OnDutyHolder value)) return;
             onDuty.Remove(player.CSteamID);
             TranslationHelper.SendMessageTranslation(player.CSteamID, "Duty_OffDuty", value.DutyName, TimeConverterManager.Format(TimeConverterManager.getTimeSpan(value.StartDate, DateTime.Now), 2));
-            if (player.IsAdmin)
+            if (player.IsAdmin && onDuty[player.CSteamID].BlueHammer)
             {
                 player.Admin(false);
                 DebugManager.SendDebugMessage("Removing BlueHammer for " + player.CharacterName);
@@ -316,6 +332,17 @@ namespace BTDuty
                 });
                 yield return new WaitForSeconds(time);
             }
+        }
+
+        public class OnDutyHolder
+        {
+            public string DutyName { get; set; }
+            public string GroupID { get; set; }
+            public string Permission { get; set; }
+            public bool BlueHammer { get; set; }
+            public bool GodMode { get; set; }
+            public bool Vanish { get; set; }
+            public DateTime StartDate { get; set; }
         }
     }
 }
