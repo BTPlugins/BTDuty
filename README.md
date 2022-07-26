@@ -6,6 +6,7 @@ Your normal Duty Plugin with more Features!
 - On / Off Duty Webhooks
 - TimeClock
 - Sends a Webhook every X amount of Seconds of all Active People on Duty
+- Logs such as Command Usage and Item Pickups while on Duty!
 <br/>
 
 ## REQUIREMENTS
@@ -13,7 +14,7 @@ Your normal Duty Plugin with more Features!
 
 ## Commands
 - **/Duty** &lt;Duty Tag> | ``BTDuty.Duty``
-- **/ListTags** |  ``BTDuty.ListTags``
+- **/DutyTags** |  ``BTDuty.ListTags``
 - **/TimeClock** | ``BTDuty.TimeClock``
 <br />
 
@@ -26,29 +27,52 @@ Your normal Duty Plugin with more Features!
     <BypassPermission>NoSendMessage.IfHaveThisPerm</BypassPermission>
   </ServerAnnouncer>
   <RemoveDutyOnLogout>false</RemoveDutyOnLogout>
-  <DutyLogWebhook>https://discordapp.com/api/webhooks/{webhook.id}/{webhook.api}</DutyLogWebhook>
+  <RemoveBlueHammerOnLogout>false</RemoveBlueHammerOnLogout>
+  <AllowDamageToPlayers>true</AllowDamageToPlayers>
+  <WebhookContainer>
+    <DutyLogWebhook>https://discordapp.com/api/webhooks/{webhook.id}/{webhook.api}</DutyLogWebhook>
+    <ActiveDutyWebhook>https://discordapp.com/api/webhooks/{webhook.id}/{webhook.api}</ActiveDutyWebhook>
+    <CommandWebhook>https://discordapp.com/api/webhooks/{webhook.id}/{webhook.api}</CommandWebhook>
+    <ItemAddedWebhook>https://discordapp.com/api/webhooks/{webhook.id}/{webhook.api}</ItemAddedWebhook>
+  </WebhookContainer>
   <DutyGroups>
     <Group>
       <DutyName>Helper</DutyName>
       <GroupID>Helper</GroupID>
       <Permission>BTDuty.Helper</Permission>
+      <BlueHammer>false</BlueHammer>
+      <Godmode>true</Godmode>
+      <Vanish>true</Vanish>
     </Group>
     <Group>
       <DutyName>Mod</DutyName>
       <GroupID>Moderator</GroupID>
       <Permission>BTDuty.Moderator</Permission>
+      <BlueHammer>false</BlueHammer>
+      <Godmode>true</Godmode>
+      <Vanish>true</Vanish>
     </Group>
     <Group>
       <DutyName>Admin</DutyName>
       <GroupID>Administrator</GroupID>
       <Permission>BTDuty.Administrator</Permission>
+      <BlueHammer>true</BlueHammer>
+      <Godmode>false</Godmode>
+      <Vanish>false</Vanish>
     </Group>
   </DutyGroups>
   <ActiveDutyList>
     <Enabled>true</Enabled>
     <Timer>300</Timer>
-    <WebhookURL>https://discordapp.com/api/webhooks/{webhook.id}/{webhook.api}</WebhookURL>
   </ActiveDutyList>
+  <RestrictionsHolder>
+    <BypassPermission>Ignore.CommandRestrictions</BypassPermission>
+    <RestrictedCommand>
+      <CommandName>Admin</CommandName>
+      <CommandName>Slay</CommandName>
+      <CommandName>frisk</CommandName>
+    </RestrictedCommand>
+  </RestrictionsHolder>
   <DebugMode>false</DebugMode>
 </BTDutyConfiguration>
 ```
