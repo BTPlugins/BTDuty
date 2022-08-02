@@ -90,18 +90,18 @@ namespace BTDuty.Commands
                 DebugManager.SendDebugMessage("Duty - Sending Webhook");
                 ThreadHelper.RunAsynchronously(() =>
                 {
-                    WebhookMessage Embed = new WebhookMessage()
+                    var embed = new WebhookMessage()
                     .PassEmbed()
                     .WithTitle(player.CharacterName + " Duty Log")
                     .WithColor(EmbedColor.Red)
                     .WithURL("https://steamcommunity.com/profiles/" + player.CSteamID)
-                    .WithTimestamp(DateTime.Now)
                     .WithField("**Username**", player.CharacterName + " \n(" + player.CSteamID + ")")
-                    .WithField("**TimeClock Information**", "Start Date: <t:" + ((DateTimeOffset)TimeZoneInfo.ConvertTimeToUtc(value.StartDate)).ToUnixTimeSeconds().ToString() + ">\nEnd Date: <t:" + ((DateTimeOffset)TimeZoneInfo.ConvertTimeToUtc(DateTime.Now)).ToUnixTimeSeconds().ToString() + ">" )
+                    .WithField("**TimeClock Information**", "Start Date: <t:" + ((DateTimeOffset)TimeZoneInfo.ConvertTimeToUtc(value.StartDate)).ToUnixTimeSeconds().ToString() + ">\nEnd Date: <t:" + ((DateTimeOffset)TimeZoneInfo.ConvertTimeToUtc(DateTime.Now)).ToUnixTimeSeconds().ToString() + ">")
                     .WithField("**Total Time** ", "``" + TimeConverterManager.Format(TimeConverterManager.getTimeSpan(value.StartDate, DateTime.Now), 2) + "``")
-                    .WithField("**Duty Information**", "Duty Name: ``" + duty.DutyName + "``\nPermission: ``" + duty.Permission + "``")
-                    .Finalize();
-                    DiscordWebhookService.PostMessageAsync(DutyPlugin.Instance.Configuration.Instance.WebhookContainer.DutyLogWebhook, Embed);
+                    .WithField("**Duty Information**", "Duty Name: ``" + duty.DutyName + "``\nPermission: ``" + duty.Permission + "``");
+                    embed.footer = new WebhookFooter() { text = "[BTDuty] " + Provider.serverName + " - " + DateTime.Now.ToString("dddd, dd MMMM yyyy") + "" };
+                    var send = embed.Finalize();
+                    DiscordWebhookService.PostMessageAsync(DutyPlugin.Instance.Configuration.Instance.WebhookContainer.DutyLogWebhook, send);
                 });
                 DutyPlugin.Instance.onDuty.Remove(player.CSteamID);
                 return;

@@ -81,7 +81,6 @@ namespace BTDuty
                 {
                     "Admin",
                     "Slay",
-                    "frisk",
                 },
             };
             DebugMode = false;
