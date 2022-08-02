@@ -121,8 +121,9 @@ namespace BTDuty
 
         private void DamageTool_damagePlayerRequested(ref DamagePlayerParameters parameters, ref bool shouldAllow)
         {
-            if (parameters.killer == null || parameters.player == null) return;
-            var killer = UnturnedPlayer.FromCSteamID(parameters.killer);
+            var kil = PlayerTool.getPlayer(parameters.killer);
+            if (kil == null) return;
+            var killer = UnturnedPlayer.FromPlayer(kil);
             var victim = UnturnedPlayer.FromPlayer(parameters.player);
             if (onDuty.ContainsKey(killer.CSteamID) && DutyPlugin.Instance.Configuration.Instance.AllowDamageToPlayers)
             {
