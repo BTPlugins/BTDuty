@@ -1,5 +1,6 @@
 # BTDuty
 Your normal Duty Plugin with more Features!
+[![Github All Releases](https://img.shields.io/github/downloads/BTPlugins/BTDuty/total.svg)]()
 <br/>
 ## Features
 - Easy to Configure. Unlike the old Duty Plugin
