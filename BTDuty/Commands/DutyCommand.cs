@@ -109,9 +109,9 @@ namespace BTDuty.Commands
             // Going on Duty
             DebugManager.SendDebugMessage(player.CharacterName + " is now going on Duty for: " + duty.DutyName);
             R.Permissions.AddPlayerToGroup(duty.GroupID, player);
-            DutyPlugin.Instance.onDuty.Add(player.CSteamID, new DutyPlugin.OnDutyHolder { DutyName = duty.DutyName, GroupID = duty.GroupID, BlueHammer = duty.BlueHammer, GodMode = duty.Godmode, Vanish = duty.Vanish, Permission = duty.Permission, StartDate = DateTime.Now });
+            DutyPlugin.Instance.onDuty.Add(player.CSteamID, new DutyPlugin.OnDutyHolder { DutyName = duty.DutyName, GroupID = duty.GroupID, BlueHammer = duty.DutySettings.BlueHammer, GodMode = duty.DutySettings.Godmode, Vanish = duty.DutySettings.Vanish, Permission = duty.Permission, AllowDamageToPlayers = duty.DutySettings.AllowDamageToPlayers, StartDate = DateTime.Now });
             TranslationHelper.SendMessageTranslation(player.CSteamID, "Duty_OnDuty", duty.DutyName);
-            if (duty.BlueHammer)
+            if (duty.DutySettings.BlueHammer)
             {
                 player.Admin(true);
             }

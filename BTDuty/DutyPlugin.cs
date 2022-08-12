@@ -100,7 +100,6 @@ namespace BTDuty
                             break;
                         }
                     }
-
                     ThreadHelper.RunAsynchronously(() =>
                     {
                         var embed = new WebhookMessage()
@@ -126,7 +125,7 @@ namespace BTDuty
             if (kil == null) return;
             var killer = UnturnedPlayer.FromPlayer(kil);
             var victim = UnturnedPlayer.FromPlayer(parameters.player);
-            if (onDuty.ContainsKey(killer.CSteamID) && DutyPlugin.Instance.Configuration.Instance.AllowDamageToPlayers)
+            if (onDuty.ContainsKey(killer.CSteamID) && !onDuty[killer.CSteamID].AllowDamageToPlayers)
             {
                 DebugManager.SendDebugMessage("Canceling Damage from " + killer.CharacterName);
                 TranslationHelper.SendMessageTranslation(killer.CSteamID, "DamageCanceled", victim.CharacterName);
@@ -344,6 +343,7 @@ namespace BTDuty
             public bool BlueHammer { get; set; }
             public bool GodMode { get; set; }
             public bool Vanish { get; set; }
+            public bool AllowDamageToPlayers { get; set; }
             public DateTime StartDate { get; set; }
         }
     }

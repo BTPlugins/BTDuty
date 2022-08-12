@@ -12,9 +12,19 @@ namespace BTDuty.Modules
         public string DutyName { get; set; }
         public string GroupID { get; set; }
         public string Permission { get; set; }
+        public DutySettings DutySettings { get; set; }
+        /*
         public bool BlueHammer { get; set; }
         public bool Godmode { get; set; }
         public bool Vanish { get; set; }
+        */
+    }
+    public class DutySettings
+    {
+        public bool BlueHammer { get; set; }
+        public bool Godmode { get; set; }
+        public bool Vanish { get; set; }
+        public bool AllowDamageToPlayers { get; set; }
     }
 
     public class WebhookContainer

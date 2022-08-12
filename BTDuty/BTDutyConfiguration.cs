@@ -14,7 +14,6 @@ namespace BTDuty
         public ServerAnnouncer ServerAnnouncer { get; set; }
         public bool RemoveDutyOnLogout { get; set; }
         public bool RemoveBlueHammerOnLogout { get; set; }
-        public bool AllowDamageToPlayers { get; set; }
         public WebhookContainer WebhookContainer { get; set; }
         [XmlArrayItem("Group")]
         public List<DutyGroups> DutyGroups { get; set; }
@@ -31,7 +30,6 @@ namespace BTDuty
             };
             RemoveDutyOnLogout = false;
             RemoveBlueHammerOnLogout = false;
-            AllowDamageToPlayers = true;
             WebhookContainer = new WebhookContainer()
             {
                 DutyLogWebhook = "https://discordapp.com/api/webhooks/{webhook.id}/{webhook.api}",
@@ -46,27 +44,39 @@ namespace BTDuty
                     DutyName = "Helper",
                     GroupID = "Helper",
                     Permission = "BTDuty.Helper",
-                    BlueHammer = false,
-                    Vanish = true,
-                    Godmode = true,
+                    DutySettings = new DutySettings()
+                    {
+                        BlueHammer = false,
+                        Vanish = true,
+                        Godmode = true,
+                        AllowDamageToPlayers = false,
+                    },
                 },
                 new DutyGroups()
                 {
                     DutyName = "Mod",
                     GroupID = "Moderator",
                     Permission = "BTDuty.Moderator",
-                    BlueHammer = false,
-                    Vanish = true,
-                    Godmode = true,
+                    DutySettings = new DutySettings()
+                    {
+                        BlueHammer = false,
+                        Vanish = true,
+                        Godmode = true,
+                        AllowDamageToPlayers = false,
+                    },
                 },
                 new DutyGroups()
                 {
                     DutyName = "Admin",
                     GroupID = "Administrator",
                     Permission = "BTDuty.Administrator",
-                    BlueHammer = true,
-                    Vanish = false,
-                    Godmode = false,
+                    DutySettings = new DutySettings()
+                    {
+                        BlueHammer = false,
+                        Vanish = false,
+                        Godmode = false,
+                        AllowDamageToPlayers = true,
+                    },
                 },
             };
             ActiveDutyList = new ActiveDutyList()
