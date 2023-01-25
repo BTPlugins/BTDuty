@@ -41,7 +41,6 @@ namespace BTDuty
             DamageTool.damagePlayerRequested += DamageTool_damagePlayerRequested;
             R.Commands.OnExecuteCommand += OnCommandExecuted;
             UnturnedPlayerEvents.OnPlayerInventoryAdded += OnPlayerInventoryAdded;
-
         }
 
         protected override void Unload()
@@ -60,7 +59,7 @@ namespace BTDuty
             if (onDuty.ContainsKey(player.CSteamID))
             {
                 DebugManager.SendDebugMessage("Sending Webhook");
-                ThreadHelper.RunAsynchronously(() =>
+                ThreadHelper.RunAsynchronously(async () =>
                 {
                     var embed = new WebhookMessage()
                     .PassEmbed()
@@ -73,7 +72,7 @@ namespace BTDuty
                     .WithField("**Item ID**", P.item.id.ToString());
                     embed.footer = new WebhookFooter() { text = "[BTDuty] " + Provider.serverName + " - " + DateTime.Now.ToString("dddd, dd MMMM yyyy") + "" };
                     var send = embed.Finalize();
-                    DiscordWebhookService.PostMessageAsync(DutyPlugin.Instance.Configuration.Instance.WebhookContainer.ItemAddedWebhook, send);
+                    await DiscordWebhookService.PostMessageAsync(DutyPlugin.Instance.Configuration.Instance.WebhookContainer.ItemAddedWebhook, send);
                 });
             }
         }
@@ -100,7 +99,7 @@ namespace BTDuty
                             break;
                         }
                     }
-                    ThreadHelper.RunAsynchronously(() =>
+                    ThreadHelper.RunAsynchronously(async () =>
                     {
                         var embed = new WebhookMessage()
                         .PassEmbed()
@@ -113,7 +112,7 @@ namespace BTDuty
                         .WithField("Cancled: ", IsCanceld.ToString());
                         embed.footer = new WebhookFooter() { text = "[BTDuty] " + Provider.serverName + " - " + DateTime.Now.ToString("dddd, dd MMMM yyyy") + "" };
                         var send = embed.Finalize();
-                        DiscordWebhookService.PostMessageAsync(DutyPlugin.Instance.Configuration.Instance.WebhookContainer.CommandWebhook, send);
+                        await DiscordWebhookService.PostMessageAsync(DutyPlugin.Instance.Configuration.Instance.WebhookContainer.CommandWebhook, send);
                     });
                 }
             }
@@ -218,7 +217,7 @@ namespace BTDuty
                         }
                     }
                     DebugManager.SendDebugMessage("Player Logout - Sending Webhook");
-                    ThreadHelper.RunAsynchronously(() =>
+                    ThreadHelper.RunAsynchronously(async () =>
                     {
                         var embed = new WebhookMessage()
                         .PassEmbed()
@@ -231,7 +230,7 @@ namespace BTDuty
                         .WithField("**Duty Information**", "Duty Name: ``" + offDuty.DutyName + "``\nPermission: ``" + offDuty.Permission + "``");
                         embed.footer = new WebhookFooter() { text = "[BTDuty] " + Provider.serverName + " - " + DateTime.Now.ToString("dddd, dd MMMM yyyy") + "" };
                         var send = embed.Finalize();
-                        DiscordWebhookService.PostMessageAsync(DutyPlugin.Instance.Configuration.Instance.WebhookContainer.DutyLogWebhook, send);
+                        await DiscordWebhookService.PostMessageAsync(DutyPlugin.Instance.Configuration.Instance.WebhookContainer.DutyLogWebhook, send);
                     });
                     DutyPlugin.Instance.onDuty.Remove(player.CSteamID);
                     return;
@@ -272,7 +271,7 @@ namespace BTDuty
                     TranslationHelper.SendMessageTranslation(user.CSteamID, "Broadcast_OffDuty", player.CharacterName, offDuty.DutyName);
                 }
             }
-            ThreadHelper.RunAsynchronously(() =>
+            ThreadHelper.RunAsynchronously(async () =>
             {
                 var embed = new WebhookMessage()
                 .PassEmbed()
@@ -285,7 +284,7 @@ namespace BTDuty
                 .WithField("**Duty Information**", "Duty Name: ``" + offDuty.DutyName + "``\nPermission: ``" + offDuty.Permission + "``");
                 embed.footer = new WebhookFooter() { text = "[BTDuty] " + Provider.serverName + " - " + DateTime.Now.ToString("dddd, dd MMMM yyyy") + "" };
                 var send = embed.Finalize();
-                DiscordWebhookService.PostMessageAsync(DutyPlugin.Instance.Configuration.Instance.WebhookContainer.DutyLogWebhook, send);
+                await DiscordWebhookService.PostMessageAsync(DutyPlugin.Instance.Configuration.Instance.WebhookContainer.DutyLogWebhook, send);
             });
 
             onDuty.Remove(player.CSteamID);
@@ -320,7 +319,7 @@ namespace BTDuty
                 var ip = Provider.ip;
                 var bytes = BitConverter.GetBytes(ip);
                 var serverIP = $"{bytes[0]}.{bytes[1]}.{bytes[2]}.{bytes[3]}";
-                ThreadHelper.RunAsynchronously(() =>
+                ThreadHelper.RunAsynchronously(async () =>
                 {
                     var embed = new WebhookMessage()
                     .PassEmbed()
@@ -329,7 +328,7 @@ namespace BTDuty
                     .WithDescription("**Server IP:** " + serverIP + "\n **Server Port:** " + Provider.port + "\n\n**[ Duty List ]**\n\n" + sb.ToString());
                     embed.footer = new WebhookFooter() { text = "[BTDuty] " + Provider.serverName + " - " + DateTime.Now.ToString("dddd, dd MMMM yyyy") + "" };
                     var send = embed.Finalize();
-                    DiscordWebhookService.PostMessageAsync(DutyPlugin.Instance.Configuration.Instance.WebhookContainer.ActiveDutyWebhook, send);
+                    await DiscordWebhookService.PostMessageAsync(DutyPlugin.Instance.Configuration.Instance.WebhookContainer.ActiveDutyWebhook, send);
                 });
                 yield return new WaitForSeconds(time);
             }

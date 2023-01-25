@@ -88,7 +88,7 @@ namespace BTDuty.Commands
                     }
                 }
                 DebugManager.SendDebugMessage("Duty - Sending Webhook");
-                ThreadHelper.RunAsynchronously(() =>
+                ThreadHelper.RunAsynchronously(async () =>
                 {
                     var embed = new WebhookMessage()
                     .PassEmbed()
@@ -101,7 +101,7 @@ namespace BTDuty.Commands
                     .WithField("**Duty Information**", "Duty Name: ``" + duty.DutyName + "``\nPermission: ``" + duty.Permission + "``");
                     embed.footer = new WebhookFooter() { text = "[BTDuty] " + Provider.serverName + " - " + DateTime.Now.ToString("dddd, dd MMMM yyyy") + "" };
                     var send = embed.Finalize();
-                    DiscordWebhookService.PostMessageAsync(DutyPlugin.Instance.Configuration.Instance.WebhookContainer.DutyLogWebhook, send);
+                    await DiscordWebhookService.PostMessageAsync(DutyPlugin.Instance.Configuration.Instance.WebhookContainer.DutyLogWebhook, send);
                 });
                 DutyPlugin.Instance.onDuty.Remove(player.CSteamID);
                 return;
@@ -125,7 +125,7 @@ namespace BTDuty.Commands
                 player.Features.GodMode = true;
             }
             //
-            if (DutyPlugin.Instance.Configuration.Instance.ServerAnnouncer.Enabled && !player.HasPermission(DutyPlugin.Instance.Configuration.Instance.ServerAnnouncer.BypassPermission))
+            if (DutyPlugin.Instance.Configuration.Instance.ServerAnnouncer.Enabled && R.Permissions.GetPermissions(player, DutyPlugin.Instance.Configuration.Instance.ServerAnnouncer.BypassPermission).Count == 0)
             {
                 foreach (SteamPlayer steamPlayer in Provider.clients)
                 {
