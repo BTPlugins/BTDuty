@@ -36,6 +36,7 @@ namespace BTDuty
                 ActiveDutyWebhook = "https://discordapp.com/api/webhooks/{webhook.id}/{webhook.api}",
                 CommandWebhook = "https://discordapp.com/api/webhooks/{webhook.id}/{webhook.api}",
                 ItemAddedWebhook = "https://discordapp.com/api/webhooks/{webhook.id}/{webhook.api}",
+                DutySummary = "https://discordapp.com/api/webhooks/{webhook.id}/{webhook.api}",
             };
             DutyGroups = new List<DutyGroups>()
             {

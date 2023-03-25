@@ -34,6 +34,7 @@ namespace BTDuty.Modules
 
         public string CommandWebhook { get; set; }
         public string ItemAddedWebhook { get; set; }
+        public string DutySummary { get; set; }
     }
     public class ServerAnnouncer
     {
